@@ -1,0 +1,9 @@
+<?php
+
+function islandora_checkstreams_help($path, $arg) {
+  switch ($path) {
+    case "admin/help#islandora_checkstreams":
+      return '' . t("Test collection objects for datastreams") . '';
+      break;
+  }
+} 

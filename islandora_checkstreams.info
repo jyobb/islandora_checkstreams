@@ -1,0 +1,5 @@
+name = Check Integrity of Islandora Datastreams
+description = Ensure all objects in a collection have requested datastreams.
+package = USask
+version = 7.x-dev
+core = 7.x
