@@ -47,4 +47,47 @@ file_put_contents($filepath, "\nfound: " . implode(",", $in_list), FILE_APPEND);
 
 }
 
+
+function islandora_get_mime_types( $parentPID, $dataStream, $filepath ){
+
+  $query = <<<EOQ
+  SELECT ?pid FROM <#ri>
+WHERE {
+    {
+  ?pid <fedora-rels-ext:isMemberOf> <info:fedora/$parentPID>
+  }
+  UNION
+  {
+  ?pid <fedora-rels-ext:isMemberOfCollection> <info:fedora/$parentPID>
+  }
+}
+EOQ;
+  $connection = islandora_get_tuque_connection();
+
+  $sparql_count = $connection->repository->ri->countQuery($query, 'sparql');
+  $results = $connection->repository->ri->sparqlQuery($query); 
+
+  $in_list = array();
+
+  foreach ($results as $result) {
+    $fedoraObject = islandora_object_load($result['pid']['value']);
+
+    if(isset($fedoraObject[$dataStream])){
+      $in_list[$fedoraObject->id] = $fedoraObject[$dataStream]->mimetype;
+      
+    }
+}
+
+$outstring = '';
+foreach($in_list as $k => $v){
+
+$outstring .= $k . " : " . $v . "\n";
+
+}
+
+file_put_contents($filepath, "found: \n" . $outstring);
+
+}
+
+
 ?>

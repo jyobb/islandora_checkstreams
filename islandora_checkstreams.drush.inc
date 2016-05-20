@@ -37,9 +37,60 @@ function islandora_checkstreams_drush_command() {
     'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_LOGIN,
   );
 
+  $items['islandora_checkmimes'] = array(
+    'aliases' => array('icm'),
+    'description' => 'Check the mimetypes of a collection are correct.',
+    'drupal dependencies' => array('islandora_checkstreams'),
+    'examples' => array(
+     'drush -v --user=fedora_admin --uri=http://islandorasev_dev.ca islandora_checkmimes --parentpid="apid:111" --datastream="MODS" --outfile="outfilename.txt"',
+    ),
+    'options' => array(
+      'parentpid' => array(
+        'description' => 'collections object pid',
+        'required' => TRUE,
+      ),
+      'datastream' => array(
+        'description' => 'Target datastream to look for',
+        'required' => TRUE,
+      ),
+      'outfile' => array(
+        'description' => 'File name to save output',
+        'required' => TRUE,
+      ),
+    ),
+    'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_LOGIN,
+  );
+
+
+
+
 return $items;
 
 }
+
+function drush_islandora_checkstreams_islandora_checkmimes(){
+//function drush_islandora_checkmimes(){
+
+  $parentPID = drush_get_option('parentpid');
+  $dataStream = drush_get_option('datastream');
+  $outFilename = drush_get_option('outfile');
+
+  $base = drupal_get_path('module', 'islandora_checkstreams');
+
+  $filepath = DRUPAL_ROOT . '/' . $base . '/data/' . $outFilename;
+
+
+module_load_include('inc', 'islandora_checkstreams', 'includes/analyzer');
+
+islandora_get_mime_types($parentPID, $dataStream, $filepath );
+
+
+
+}
+
+
+
+
 
 
 /**
