@@ -62,8 +62,8 @@ WHERE {
   }
 }
 EOQ;
-  $connection = islandora_get_tuque_connection();
 
+  $connection = islandora_get_tuque_connection();
   $sparql_count = $connection->repository->ri->countQuery($query, 'sparql');
   $results = $connection->repository->ri->sparqlQuery($query); 
 
@@ -71,12 +71,40 @@ EOQ;
 
   foreach ($results as $result) {
     $fedoraObject = islandora_object_load($result['pid']['value']);
-
     if(isset($fedoraObject[$dataStream])){
       $in_list[$fedoraObject->id] = $fedoraObject[$dataStream]->mimetype;
       
     }
-}
+  }
+
+
+
+  $bquery = <<<EOQB
+  SELECT ?page FROM <#ri>
+WHERE {
+
+  ?pid <fedora-rels-ext:isMemberOfCollection> <info:fedora/$parentPID>.
+  ?pid <fedora-model:hasModel> <info:fedora/islandora:bookCModel>.
+  ?page <fedora-rels-ext:isMemberOf> ?pid
+  }
+EOQB;
+
+  $bconnection = islandora_get_tuque_connection();
+  $bsparql_count = $connection->repository->ri->countQuery($bquery, 'sparql');
+  $bresults = $connection->repository->ri->sparqlQuery($bquery); 
+
+  foreach ($bresults as $bresult) {
+
+    $fedoraObject = islandora_object_load($bresult['page']['value']);
+    if(isset($fedoraObject[$dataStream])){
+      $in_list[$fedoraObject->id] = $fedoraObject[$dataStream]->mimetype;      
+    }
+  }
+
+
+
+
+
 
 $outstring = '';
 foreach($in_list as $k => $v){
